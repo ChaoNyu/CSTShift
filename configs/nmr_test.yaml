@@ -1,0 +1,28 @@
+data:
+  # dataset_class: MergedQMShiftDataset 
+  # dataset_class: CaseStudyDataset 
+  dataset_args: 
+  #   root: /scratch/ch3859/nmr_process_data_inputs/qm_shift_merged/carbon/
+    root: /scratch/ch3859/nmr_process_data_inputs/qm_shift_merged/carbon/
+  # split: /scratch/ch3859/nmr_process_data_inputs/qm_shift_merged/carbon/processed/split.pt
+toy_split: 500
+n_module: 2
+n_feature: 8
+n_output: 1
+num_epochs: 30
+learning_rate: 0.001
+batch_size: 8
+valid_batch_size: 8
+log_file_name: training.log
+normalize: True
+scheduler: ReduceLROnPlateau[factor=0.3,patience=30,eps=5e-8]
+folder_suffix: nmrtest
+comment: nmr test using small data split
+target_names: 
+- atom_y
+mask_atom: True
+stop_low_lr: True
+ext_atom_features: raw_qmd_features
+ext_atom_features_norm: by_element
+ext_atom_dim: 3
+ext_atom_method: out
