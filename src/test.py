@@ -13,7 +13,7 @@ import json
 import shutil
 import utils.nmr_dataset as nmr_dataset
 from torch_geometric.loader import DataLoader
-from Networks.PhysDimeNet import sPhysNet, CSTShiftEmb, CSTShiftOut
+from src.Networks.CSTShift import sPhysNet, CSTShiftEmb, CSTShiftOut
 from torch.optim.swa_utils import AveragedModel
 
 

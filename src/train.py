@@ -13,7 +13,7 @@ import torch.cuda
 import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 from torch_geometric.loader import DataLoader
-from Networks.PhysDimeNet import CSTShiftEmb, CSTShiftOut, sPhysNet
+from src.Networks.CSTShift import CSTShiftEmb, CSTShiftOut, sPhysNet
 import utils.nmr_dataset as nmr_dataset
 from utils.LossFn import LossFn
 from utils.Optimizers import EmaAmsGrad
