@@ -15,10 +15,18 @@
 </figure>
 
 ## Environment setup
-### If you are using Linux and Conda
+We recommand to use conda to create a new environment and install the required packages. 
 
-### If you are on other systems or are using other package managers
-please install the following packages by checking their websites.
+```bash
+conda create -n cstshift python=3.9
+conda activate cstshift
+conda install -c conda-forge rdkit
+conda install numpy pandas PyYAML
+conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
+conda install pyg -c pyg
+```
+
+If you need to install the package of a specific version or on other platforms, please refer to the official website of the package for more details.
 
 ## Data perparation
 Datasets of NMRShiftDB2, CHESHIRE, TIC-10 and NHP will be provided later. Check the case study dataset provided here for a general idea of the data format. You can also implement your own dataset class similar to `NMRDataset` if you want to train or evaluate the model on your own dataset.
