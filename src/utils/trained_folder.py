@@ -68,11 +68,12 @@ class TrainedFolder:
         if self.dataset_args is not None:
             dataset_class = getattr(nmr_dataset, self.dataset_class)
             self.data_provider = dataset_class(**self.dataset_args)
+            # default split is using all the data for testing
             self.splits = get_split(self.split_file_path) if self.split_file_path else get_split(all_test=len(self.data_provider.data['N']))
         else:  # read from original dataset
             dataset_class = getattr(nmr_dataset, self.args['data']['dataset_class']) if 'dataset_class' in self.args['data'] else nmr_dataset.NMRDatasetFromProcessed
             self.data_provider = dataset_class(**self.args['data']['dataset_args'])
-            self.splits = get_split(self.args['data']['split'])  # TODO
+            self.splits = get_split(self.args['data']['split']) if 'split' in self.args['data'] else get_split(all_test=len(self.data_provider.data['N']))
     
     def get_test_dir(self):
         if self.new_test_dir_prefix:
