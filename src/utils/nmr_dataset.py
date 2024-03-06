@@ -141,7 +141,7 @@ class NMRDatasetFromCSV(NMRDataset):
     """
     Dataset class for molecules with both experiemental and DFT calculated nmr shift values. The nmr shift values are read from a csv file.
     Suppose the csv file is in the raw file path. The csv file should contain at least the following columns:
-    - name: name of the molecule
+    - mol_id: id of the molecule, this should correspond to the name of the nmr log file. 
     - atom_type: type of the atom
     - atom_index: index of the atom
     - shift: nmr shift value
@@ -166,16 +166,19 @@ class NMRDatasetFromCSV(NMRDataset):
     def get_mol_info_from_log(self, nmr_log_path):
         mol_info = get_all_data_from_nmr_log(nmr_log_path)
         # add name of the mol
-        mol_info.update({'mol_name': osp.basename(nmr_log_path).split('.')[0]})  # TODO
+        mol_info.update({'mol_id': self.get_mol_id_from_nmr_log_name(nmr_log_path)})
         return mol_info
     
     def get_shift_dict(self, mol_info):
         """
         Get the shift dict from the mol_info.
         """
-        mol_csv_data = self.csv_file[self.csv_file['name'] == mol_info['mol_name']]
+        mol_csv_data = self.csv_file[self.csv_file['mol_id'] == mol_info['mol_id']]
         shift_dict = dict(zip(mol_csv_data['atom_index'], mol_csv_data['shift']))
         return shift_dict
+    
+    def get_mol_id_from_nmr_log_name(self, nmr_log_name):
+        return osp.basename(nmr_log_name).split('.')[0]
 
 
 class CaseStudyDataset(NMRDatasetFromCSV):

@@ -45,12 +45,15 @@ class TrainedFolder:
                  dataset_args=None,
                  dataset_class=None,
                  split=None,
-                 ignore_train=True, ignore_val=False, 
+                 ignore_train=True, 
+                 ignore_val=False, 
+                 labeled_data=False,
                  explicit_ds_config=None):
         self.folder_name = folder_name
         self.new_test_dir_prefix = new_test_dir_prefix
         self.dataset_args = dataset_args
         self.dataset_class = dataset_class if dataset_class is not None else 'NMRDatasetFromProcessed'
+        self.labeled_data = labeled_data
         self.split_file_path = split
         self.ignore_train = ignore_train
         self.ignore_val = ignore_val
@@ -152,10 +155,46 @@ class TrainedFolder:
         self.logger.info("----------- end of {} ------------".format(index_short))
 
     def test_step(self, data_loader, result_file):
-        result = val_step_new(self.model, data_loader, self.loss_fn, mol_lvl_detail=True)
-        result["target_names"] = self.loss_fn.target_names
-        torch.save(result, result_file)
-        return result
+        if self.labeled_data:
+            result = val_step_new(self.model, data_loader, self.loss_fn, mol_lvl_detail=True)
+            result["target_names"] = self.loss_fn.target_names
+            torch.save(result, result_file)
+            return result
+        else:
+            return self.test_step_unlabeled(data_loader, result_file)
+    
+    def test_step_unlabeled(self, data_loader, result_file):
+        """test step for unlabeled data, the loss is not calculated. 
+        Prediction along with atom index and molecule id are saved to a csv file.
+        """
+        self.model.eval()
+        prop_pred = []
+        atom_index_in_mols = []
+        mol_id = []
+        with torch.set_grad_enabled(False):
+            for val_data in data_loader:
+                val_data = val_data.to(get_device())
+                this_prop_pred = self.model(val_data)["atom_prop"]
+                this_atom_index = torch.cat([torch.arange(n) for n in val_data.N], dim=0)
+                this_mol_id = []
+                for i in range(len(val_data['mol_name'])):  # TODO
+                    this_mol_id.extend([val_data['mol_name'][i]] * val_data.N[i])
+                if self.args['mask_atom']:
+                    mask = val_data.mask.bool()
+                    this_prop_pred = this_prop_pred[mask, :]
+                    this_atom_index = this_atom_index[mask]
+                    this_mol_id = [this_mol_id[i] for i in range(len(this_mol_id)) if mask[i]]
+                prop_pred.append(this_prop_pred)
+                atom_index_in_mols.append(this_atom_index)
+                mol_id.extend(this_mol_id)
+        prop_pred = torch.cat(prop_pred, dim=0)
+        atom_index_in_mols = torch.cat(atom_index_in_mols, dim=0)
+        result_csv = result_file.replace('.pt', '.csv')
+        result_df = pd.DataFrame(prop_pred.detach().cpu().numpy(), columns=['PROP_PRED'])
+        result_df['ATOM_INDEX'] = atom_index_in_mols.detach().cpu().numpy()
+        result_df['MOL_ID'] = mol_id
+        result_df.to_csv(result_csv, index=False)
+        return {"PROP_PRED": prop_pred}
 
     def save_config(self):
         chk_dict = {}
@@ -192,11 +231,9 @@ class EmsembleTrainedFolder(TrainedFolder):
                  dataset_class=None,
                  split=None,
                  labeled_data=False,
-                 save_csv=False,
                  ignore_train=True, 
                  ignore_val=False):
         self.labeled_data = labeled_data
-        self.save_csv = save_csv
         self.folder_name_list = folder_name_list
         super().__init__(new_test_dir_prefix=new_test_dir_prefix, ignore_train=ignore_train, ignore_val=ignore_val, 
                          dataset_args=dataset_args, dataset_class=dataset_class, split=split)
@@ -221,35 +258,3 @@ class EmsembleTrainedFolder(TrainedFolder):
             self.ensemble_model_list.append(model)
         ens_model = EnsembleTrainedModel(self.ensemble_model_list)
         return ens_model
-
-    def test_step(self, data_loader, result_file):
-        if self.labeled_data:
-            return super().test_step(data_loader, result_file)
-        else:
-            return self.test_step_unlabeled(data_loader, result_file, save_csv=self.save_csv)
-
-    def test_step_unlabeled(self, data_loader, result_file, save_csv=False):
-        """test step for unlabeled data, the loss is not calculated. Prediciton and atom index is saved."""
-        self.model.eval()
-        prop_pred = []
-        atom_index = []
-        with torch.set_grad_enabled(False):
-            for val_data in data_loader:
-                val_data = val_data.to(get_device())
-                this_prop_pred = self.model(val_data)["atom_prop"]
-                if self.args['mask_atom']:
-                    mask = val_data.mask.bool()
-                    this_prop_pred = this_prop_pred[mask, :]
-                    this_atom_index = val_data.mask.nonzero(as_tuple=True)[0]
-                else:
-                    this_atom_index = torch.arange(val_data.N)
-                prop_pred.append(this_prop_pred)
-                atom_index.append(this_atom_index)
-        result = {'PROP_PRED': torch.cat(prop_pred, dim=0), 'ATOM_INDEX': torch.cat(atom_index, dim=0)}
-        torch.save(result, result_file)
-        if save_csv:
-            result_csv = result_file.replace('.pt', '.csv')
-            result_df = pd.DataFrame(result['PROP_PRED'].detach().cpu().numpy(), columns=['PROP_PRED'])
-            result_df['ATOM_INDEX'] = result['ATOM_INDEX'].detach().cpu().numpy()
-            result_df.to_csv(result_csv, index=False)
-        return result
