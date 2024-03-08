@@ -14,7 +14,7 @@ import json
 import shutil
 import utils.nmr_dataset as nmr_dataset
 from torch_geometric.loader import DataLoader
-from src.Networks.CSTShift import sPhysNet, CSTShiftEmb, CSTShiftOut
+from Networks.CSTShift import sPhysNet, CSTShiftEmb, CSTShiftOut
 from torch.optim.swa_utils import AveragedModel
 import pandas as pd
 
@@ -177,8 +177,8 @@ class TrainedFolder:
                 this_prop_pred = self.model(val_data)["atom_prop"]
                 this_atom_index = torch.cat([torch.arange(n) for n in val_data.N], dim=0)
                 this_mol_id = []
-                for i in range(len(val_data['mol_name'])):  # TODO
-                    this_mol_id.extend([val_data['mol_name'][i]] * val_data.N[i])
+                for i in range(len(val_data['mol_id'])):  # TODO
+                    this_mol_id.extend([val_data['mol_id'][i]] * val_data.N[i])
                 if self.args['mask_atom']:
                     mask = val_data.mask.bool()
                     this_prop_pred = this_prop_pred[mask, :]
@@ -235,7 +235,7 @@ class EmsembleTrainedFolder(TrainedFolder):
                  ignore_val=False):
         self.labeled_data = labeled_data
         self.folder_name_list = folder_name_list
-        super().__init__(new_test_dir_prefix=new_test_dir_prefix, ignore_train=ignore_train, ignore_val=ignore_val, 
+        super().__init__(new_test_dir_prefix=new_test_dir_prefix, ignore_train=ignore_train, ignore_val=ignore_val, labeled_data=labeled_data,
                          dataset_args=dataset_args, dataset_class=dataset_class, split=split)
 
     def get_args(self):

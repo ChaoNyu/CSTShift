@@ -7,7 +7,7 @@ import torch
 import subprocess
 
 # floating type
-floating_type = torch.double  # TODO: place that's different with branch chaoh-dev (float32 )
+floating_type = torch.double
 _device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
@@ -252,7 +252,7 @@ def get_git_revision_short_hash() -> str:
     return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).decode('ascii').strip()
 
 
-def get_split(file_path, train_index=None, valid_index=None, test_index=None, all_test=0, toy_split=0, save=False):
+def get_split(file_path=None, train_index=None, valid_index=None, test_index=None, all_test=0, toy_split=0, save=False):
     """get the split of dataset"""
     # read from file_path if file exists
     if file_path and os.path.exists(file_path):

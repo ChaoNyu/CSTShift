@@ -79,7 +79,6 @@ class NMRDataset(InMemoryDataset, ABC):
         Get mol_info from the nmr log file.
         return: dict containing the info of the molecule.
         """
-        return {}
     
     @abstractmethod
     def get_nmr_log_path_list(self):
@@ -151,17 +150,25 @@ class NMRDatasetFromCSV(NMRDataset):
         root: Optional[str] = None,
         nmr_log_path: Optional[str] = None,
         csv_file_name: Optional[str] = 'nmr_shift.csv',
+        atom_type: Optional[str] = 'C',
         transform: Optional[Callable] = None,
         pre_transform: Optional[Callable] = None,
         pre_filter: Optional[Callable] = None
     ):
         self.csv_file = pd.read_csv(osp.join(root, 'raw', csv_file_name))
+        atom_type_num = 6 if atom_type == 'C' else 1
+        self.csv_file = self.csv_file[self.csv_file['atom_type'] == atom_type_num]
+        self.atom_type = atom_type
         self.csv_file_name = csv_file_name
         super().__init__(root, nmr_log_path, transform, pre_transform, pre_filter)
     
     @property
     def raw_file_names(self):
         return [self.csv_file_name]
+    
+    @property
+    def processed_file_names(self):
+        return ['processed_c.pt'] if self.atom_type == 'C' else ['processed_h.pt']
     
     def get_mol_info_from_log(self, nmr_log_path):
         mol_info = get_all_data_from_nmr_log(nmr_log_path)
@@ -173,33 +180,17 @@ class NMRDatasetFromCSV(NMRDataset):
         """
         Get the shift dict from the mol_info.
         """
+        # change mol_info['mol_id'] to the same dtype as the mol_id in the csv file
+        if isinstance(self.csv_file['mol_id'].iloc[0], str):
+            mol_info['mol_id'] = str(mol_info['mol_id'])
+        else:
+            mol_info['mol_id'] = int(mol_info['mol_id'])
         mol_csv_data = self.csv_file[self.csv_file['mol_id'] == mol_info['mol_id']]
         shift_dict = dict(zip(mol_csv_data['atom_index'], mol_csv_data['shift']))
         return shift_dict
     
     def get_mol_id_from_nmr_log_name(self, nmr_log_name):
         return osp.basename(nmr_log_name).split('.')[0]
-
-
-class CaseStudyDataset(NMRDatasetFromCSV):
-    """
-    Dataset for the case study of the paper containing TIC-10 and NHP.
-    Suppose all the nmr log files are in the raw file path under the same folder nmr_log_path.
-    """
-    def __init__(
-            self, 
-            root: Optional[str] = None,
-            nmr_log_path: Optional[str] = 'NMR_output/',
-            csv_file_name: Optional[str] = 'case_study_mols.csv',
-            transform: Optional[Callable] = None,
-            pre_transform: Optional[Callable] = None,
-            pre_filter: Optional[Callable] = None,
-    ):
-        self.nmr_log_path = osp.join(root, 'raw', nmr_log_path)
-        self.csv_file = pd.read_csv(osp.join(root, 'raw', csv_file_name))
-        assert self.csv_file['atom_type'].nunique() == 1  # multiple atom types are currently not supported. Could be done by modifying self.csv_file here to screen out the atom type.
-        self.csv_file_name = csv_file_name
-        super(NMRDatasetFromCSV, self).__init__(root, self.nmr_log_path, transform, pre_transform, pre_filter)
 
     def get_nmr_log_path_list(self):
         # get the list of all the files under the path of nmr_log_path

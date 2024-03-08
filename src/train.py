@@ -13,7 +13,7 @@ import torch.cuda
 import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 from torch_geometric.loader import DataLoader
-from src.Networks.CSTShift import CSTShiftEmb, CSTShiftOut, sPhysNet
+from Networks.CSTShift import CSTShiftEmb, CSTShiftOut, sPhysNet
 import utils.nmr_dataset as nmr_dataset
 from utils.LossFn import LossFn
 from utils.Optimizers import EmaAmsGrad
@@ -308,17 +308,7 @@ class Trainer:
         return self._run_directory
 
 
-def val_step_new(model, _data_loader, loss_fn: LossFn, mol_lvl_detail=False, lightweight=True, config_dict=None):
-    """
-    Kina messy, but it works, for now.
-    :param model:
-    :param _data_loader:
-    :param loss_fn:
-    :param mol_lvl_detail:
-    :param lightweight: delete atom embedding otherwise result becomes too large
-    :param config_dict:
-    :return:
-    """
+def val_step_new(model, _data_loader, loss_fn: LossFn, mol_lvl_detail=False):
     model.eval()
     valid_size = 0
     loss = 0.
@@ -329,7 +319,7 @@ def val_step_new(model, _data_loader, loss_fn: LossFn, mol_lvl_detail=False, lig
             model_out = model(val_data)
             aggr_loss, new_loss_detail = loss_fn(model_out, val_data, loss_detail=True, mol_lvl_detail=mol_lvl_detail)
             # n_units is the batch size when predicting mol props but number of atoms when predicting atom props.
-            n_units = new_loss_detail["n_units"]
+            n_units = new_loss_detail["n_units"]  # TODO: n_units is zero here
             loss += aggr_loss.item() * n_units
             if loss_detail is None:
                 loss_detail = init_loss_detail(new_loss_detail)
@@ -386,7 +376,7 @@ def update_loss_detail_after_step(loss_detail, total_valid_size, loss):
 
 
 def train(config_dict=None, data_provider=None, ignore_valid=False):
-    trainer = Trainer(config_dict, **config_dict)  # TODO better way to pass arguments
+    trainer = Trainer(config_dict, **config_dict)
     trainer.train(data_provider, ignore_valid)
 
 
