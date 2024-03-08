@@ -2,6 +2,7 @@ from copy import deepcopy
 from typing import Union, List
 import torch
 from utils.tags import tags
+from utils.utils_functions import avg_iso_atoms, get_atom_mol_batch
 
 
 class LossFn:
@@ -24,10 +25,15 @@ class LossFn:
         self.target_names = deepcopy(target_names)
         self.num_targets = len(self.target_names)
 
-    def __call__(self, model_output, data_batch, loss_detail=False, mol_lvl_detail=False):
+    def __call__(self, model_output, data_batch, loss_detail=False, mol_lvl_detail=False, use_avg_iso_atoms=False):
         detail = {}
 
         prop_tgt, prop_pred = self.get_pred_target(model_output, data_batch)
+        if use_avg_iso_atoms:
+            atom_mol_batch = get_atom_mol_batch(data_batch['N'])
+            if self.mask_atom:
+                atom_mol_batch = atom_mol_batch[data_batch['mask'].bool()]
+            prop_pred = avg_iso_atoms(prop_pred, prop_tgt, atom_mol_batch)
 
         coe = 1.
         mae_loss = torch.mean(torch.abs(prop_pred - prop_tgt), dim=0, keepdim=True)

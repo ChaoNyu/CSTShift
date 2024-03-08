@@ -277,3 +277,30 @@ def get_split(file_path=None, train_index=None, valid_index=None, test_index=Non
         # use the amount of toy_split as the size of train_index, remain the original valid_index and test_index
         splits["train_index"] = splits["train_index"][:toy_split]
     return splits
+
+
+def avg_iso_atoms(pred, tgt, atom_mol_batch):
+    """
+    calculated averaged prediction for atoms with the same tgt in the same molecule
+    atom_mol_batch: the index of molecule, same shape as pred and tgt. e.g. [0,0,0,1,1,1,1,2,2,2,2,2]
+    """
+    new_pred = torch.zeros_like(pred)
+    all_mol_idx = torch.unique(atom_mol_batch)
+    atom_idx = 0
+    for m_idx in all_mol_idx:
+        m_pred = pred[atom_mol_batch == m_idx]
+        m_tgt = tgt[atom_mol_batch == m_idx]
+        for t in m_tgt:
+            new_pred[atom_idx] = m_pred[m_tgt == t].mean()
+            atom_idx += 1
+    return new_pred
+
+
+def get_atom_mol_batch(data_N):
+    """
+    get atom_mol_batch used for avg_iso_atoms.
+    """
+    atom_mol_batch = []
+    for i, n in enumerate(data_N):
+        atom_mol_batch.extend([i] * n)
+    return torch.tensor(atom_mol_batch)

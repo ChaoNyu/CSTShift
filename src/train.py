@@ -20,7 +20,7 @@ from utils.Optimizers import EmaAmsGrad
 from utils.tags import tags
 from utils.utils_functions import floating_type, get_lr, get_n_params, \
     remove_handler, option_solver, get_device, \
-    validate_index, get_folder_name, solv_num_workers, get_train_atomic_idx, get_ext_atom_feat_mean_std, get_git_revision_short_hash, get_split
+    validate_index, get_folder_name, solv_num_workers, get_train_atomic_idx, get_ext_atom_feat_mean_std, get_git_revision_short_hash, get_split, avg_iso_atoms
 import yaml
 
 
@@ -308,7 +308,7 @@ class Trainer:
         return self._run_directory
 
 
-def val_step_new(model, _data_loader, loss_fn: LossFn, mol_lvl_detail=False):
+def val_step_new(model, _data_loader, loss_fn: LossFn, mol_lvl_detail=False, avg_iso_atoms=False):
     model.eval()
     valid_size = 0
     loss = 0.
@@ -317,9 +317,9 @@ def val_step_new(model, _data_loader, loss_fn: LossFn, mol_lvl_detail=False):
         for val_data in _data_loader:
             val_data = val_data.to(get_device())
             model_out = model(val_data)
-            aggr_loss, new_loss_detail = loss_fn(model_out, val_data, loss_detail=True, mol_lvl_detail=mol_lvl_detail)
+            aggr_loss, new_loss_detail = loss_fn(model_out, val_data, loss_detail=True, mol_lvl_detail=mol_lvl_detail, use_avg_iso_atoms=avg_iso_atoms)
             # n_units is the batch size when predicting mol props but number of atoms when predicting atom props.
-            n_units = new_loss_detail["n_units"]  # TODO: n_units is zero here
+            n_units = new_loss_detail["n_units"]
             loss += aggr_loss.item() * n_units
             if loss_detail is None:
                 loss_detail = init_loss_detail(new_loss_detail)

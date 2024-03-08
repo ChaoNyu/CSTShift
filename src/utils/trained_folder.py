@@ -48,7 +48,8 @@ class TrainedFolder:
                  ignore_train=True, 
                  ignore_val=False, 
                  labeled_data=False,
-                 explicit_ds_config=None):
+                 explicit_ds_config=None,
+                 avg_iso_atoms=False):
         self.folder_name = folder_name
         self.new_test_dir_prefix = new_test_dir_prefix
         self.dataset_args = dataset_args
@@ -57,6 +58,7 @@ class TrainedFolder:
         self.split_file_path = split
         self.ignore_train = ignore_train
         self.ignore_val = ignore_val
+        self.avg_iso_atoms = avg_iso_atoms
         self.args = self.get_args()
         self.loss_fn = LossFn(config_dict=self.args, **self.args)
         self.test_dir = self.get_test_dir()
@@ -156,7 +158,7 @@ class TrainedFolder:
 
     def test_step(self, data_loader, result_file):
         if self.labeled_data:
-            result = val_step_new(self.model, data_loader, self.loss_fn, mol_lvl_detail=True)
+            result = val_step_new(self.model, data_loader, self.loss_fn, mol_lvl_detail=True, avg_iso_atoms=self.avg_iso_atoms)
             result["target_names"] = self.loss_fn.target_names
             torch.save(result, result_file)
             return result
@@ -226,17 +228,9 @@ class EmsembleTrainedFolder(TrainedFolder):
     """
     def __init__(self, 
                  folder_name_list,
-                 new_test_dir_prefix='test', 
-                 dataset_args=None,
-                 dataset_class=None,
-                 split=None,
-                 labeled_data=False,
-                 ignore_train=True, 
-                 ignore_val=False):
-        self.labeled_data = labeled_data
+                 **kwargs):
         self.folder_name_list = folder_name_list
-        super().__init__(new_test_dir_prefix=new_test_dir_prefix, ignore_train=ignore_train, ignore_val=ignore_val, labeled_data=labeled_data,
-                         dataset_args=dataset_args, dataset_class=dataset_class, split=split)
+        super().__init__(**kwargs)
 
     def get_args(self):
         # read all the config files in the folder_name_list
