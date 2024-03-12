@@ -29,7 +29,7 @@ conda install pyg -c pyg
 If you need to install the package of a specific version or on other platforms, please refer to the official website of the package for more details.
 
 ## Data perparation
-Datasets of NMRShiftDB2, CHESHIRE, TIC-10 and NHP will be provided later. Check the case study dataset provided here for a general idea of the data format. You can also implement your own dataset class similar to `NMRDataset` if you want to train or evaluate the model on your own dataset.
+CHESHIRE dataset is provided in data/CHESHIRE. Other datasets of NMRShiftDB2, TIC-10 and NHP will be provided later. You can also implement your own dataset class similar to `NMRDataset` if you want to train or evaluate the model on your own dataset.
 
 ```bash
 custom_dataset
@@ -38,9 +38,9 @@ custom_dataset
 │   ├── split.pt
 ├── raw
 │   ├── NMR_output
-│   │   ├── TIC10a.log
+│   │   ├── a.log
 │   │   ├── ...
-│   ├── experimental_data.csv
+│   ├── nmr_shift.csv
 ```
 
 To use the model to predict chemical shifts for your own dataset, you need to provide the DFT calculation of 3D geometry and shielding tensors using Gaussian or other quantum chemistry software. Recommanded process to obtain the calculated 3D geometry and shielding tensors is provided in the jupyter notebook `data_preparation_example.ipynb`.
@@ -48,19 +48,19 @@ To use the model to predict chemical shifts for your own dataset, you need to pr
 
 ## Run prediction with processed dataset
 
-With our provided trained models, you can directly run the prediction on the processed dataset by setting all args in a yaml file and run with the following command.
+With our provided trained models, you can directly run the prediction on the processed dataset by setting all args in a yaml file and run with the following command. 
 
 ```bash
-python src/predict.py --ens_config configs/ens_test.yaml
+python src/test.py --test_config configs/embC_test_cheshire.yaml
 ```
 
-A new folder will be generated, where the args, log file and predicted results will be saved. You can find the example yaml file under `configs/`. The prediction could be accessed in the csv file if save_csv is set to True, or in the `.pt` file as the torch tensor.
+A new folder will be generated, where the args, log file and predicted results will be saved. You can find the example yaml file under `configs/`. The prediction could be accessed in the csv file if save_csv is set to True, or in the `.pt` file as the torch tensor. Set `labeled_data=False` if you want to provide prediction on your own generated dataset without given experimental shift value.
 
 ## Train a new model and run prediction
 
 <figure>
   <img
-  src="fig/SI_fig_model.drawio.svg">
+  src="fig/SIfig_model.svg">
   <figcaption>CSTShift model architecture details</figcaption>
   <style>
     figure {
@@ -75,11 +75,11 @@ A new folder will be generated, where the args, log file and predicted results w
 You can use `train.py` to train a new model: 
   
   ```bash
-  python src/train.py --config_name configs/train.yaml
+  python src/train.py --config_name configs/concat_emb.yaml
   ```
 
-`test.py` is used to run prediction on the test set (ensemble model is not supported here):
+`test.py` is used to run prediction on the test set:
 
   ```bash
-  python src/test.py --folder_name TRAINED_MODEL_FOLDER --explicit_ds_config configs/test_case_study.yaml --ignore_val
+  python src/test.py --test_config YOUR_TEST_CONFIG
   ```
