@@ -1,11 +1,11 @@
 data:
   dataset_args: 
-    root: /scratch/ch3859/nmr_process_data_inputs/qm_shift_merged/carbon/
-  split: /scratch/ch3859/nmr_process_data_inputs/qm_shift_merged/carbon/processed/split.pt
+    root: NMRSHIFTDB2_PATH  # change this if you want to re-train a model
+  split: NMRSHIFTDB2_PATH/processed/split.pt
 n_module: 5
 n_feature: 512
 n_output: 1
-num_epochs: 10
+num_epochs: 750
 learning_rate: 0.001
 batch_size: 32
 valid_batch_size: 256

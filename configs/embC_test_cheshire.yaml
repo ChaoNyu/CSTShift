@@ -1,0 +1,13 @@
+new_test_dir_prefix: cheshire_emb_C
+folder_name: # note that folder_name should be a list for test.py to decide which test process to choose
+  - C_concat_emb1
+  - C_concat_emb2
+  - C_concat_emb3
+  - C_concat_emb4
+  - C_concat_emb5
+dataset_args: 
+  root: data/CHESHIRE/
+dataset_class: NMRDatasetFromCSV
+labeled_data: True
+ignore_val: True 
+avg_iso_atoms: True
