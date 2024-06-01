@@ -4,14 +4,6 @@
   <img
   src="fig/fig2.svg">
   <figcaption>Workflow of our CSTShift model</figcaption>
-  <style>
-    figure {
-      text-align: center;
-    }
-    figcaption {
-      text-align: center;
-    }
-  </style>
 </figure>
 
 ## Environment setup
@@ -48,7 +40,7 @@ To use the model to predict chemical shifts for your own dataset, you need to pr
 
 ## Run prediction with processed dataset
 
-With our provided trained models, you can directly run the prediction on the processed dataset by setting all args in a yaml file and run with the following command. 
+With our provided trained models, you can directly run the prediction on the processed dataset by setting all args in a yaml file and run with the following command. The trained models are accessible at https://yzhang.hpc.nyu.edu/IMA .
 
 ```bash
 python src/test.py --test_config configs/embC_test_cheshire.yaml
