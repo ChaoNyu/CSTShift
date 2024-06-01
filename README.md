@@ -1,9 +1,8 @@
 # Improving NMR chemical shift prediction by integrating DFT calculation with 3D graph neural network 
-
+Workflow of our CSTShift model:
 <figure>
   <img
   src="fig/fig2.svg">
-  <figcaption>Workflow of our CSTShift model</figcaption>
 </figure>
 
 ## Environment setup
@@ -49,19 +48,10 @@ python src/test.py --test_config configs/embC_test_cheshire.yaml
 A new folder will be generated, where the args, log file and predicted results will be saved. You can find the example yaml file under `configs/`. The prediction could be accessed in the csv file if save_csv is set to True, or in the `.pt` file as the torch tensor. Set `labeled_data=False` if you want to provide prediction on your own generated dataset without given experimental shift value.
 
 ## Train a new model and run prediction
-
+CSTShift model architecture details：
 <figure>
   <img
   src="fig/SIfig_model.svg">
-  <figcaption>CSTShift model architecture details</figcaption>
-  <style>
-    figure {
-      text-align: center;
-    }
-    figcaption {
-      text-align: center;
-    }
-  </style>
 </figure>
 
 You can use `train.py` to train a new model: 
