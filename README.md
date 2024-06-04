@@ -1,4 +1,6 @@
-# Improving NMR chemical shift prediction by integrating DFT calculation with 3D graph neural network 
+# Accurate Prediction of NMR Chemical Shifts: Integrating DFT Calculations with Three-Dimensional Graph Neural Networks 
+This is the official implementation of the CSTShift model from: [Accurate Prediction of NMR Chemical Shifts: Integrating DFT Calculations with Three-Dimensional Graph Neural Networks](dx.doi.org/10.1021/acs.jctc.4c00422).
+
 Workflow of our CSTShift model:
 <figure>
   <img
