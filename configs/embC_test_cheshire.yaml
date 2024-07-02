@@ -1,10 +1,10 @@
 new_test_dir_prefix: cheshire_emb_C
-folder_name: # note that folder_name should be a list for test.py to decide which test process to choose
-  - C_concat_emb1
-  - C_concat_emb2
-  - C_concat_emb3
-  - C_concat_emb4
-  - C_concat_emb5
+folder_name: # note that folder_name should be a list for test.py to decide which test process to choose. These 5 models together provide the ensemble prediction.
+  - model/C_concat_emb1
+  - model/C_concat_emb2
+  - model/C_concat_emb3
+  - model/C_concat_emb4
+  - model/C_concat_emb5
 dataset_args: 
   root: data/CHESHIRE/
 dataset_class: NMRDatasetFromCSV

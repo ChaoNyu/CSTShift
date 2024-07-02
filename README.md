@@ -1,5 +1,5 @@
 # Accurate Prediction of NMR Chemical Shifts: Integrating DFT Calculations with Three-Dimensional Graph Neural Networks 
-This is the official implementation of the CSTShift model from: [Accurate Prediction of NMR Chemical Shifts: Integrating DFT Calculations with Three-Dimensional Graph Neural Networks](dx.doi.org/10.1021/acs.jctc.4c00422).
+This is the official implementation of the CSTShift model from: [Accurate Prediction of NMR Chemical Shifts: Integrating DFT Calculations with Three-Dimensional Graph Neural Networks](https://pubs.acs.org/doi/10.1021/acs.jctc.4c00422).
 
 Workflow of our CSTShift model:
 <figure>
@@ -8,15 +8,15 @@ Workflow of our CSTShift model:
 </figure>
 
 ## Environment setup
-We recommand to use conda to create a new environment and install the required packages. 
+We recommand to use conda to create a new environment first. Here's the command to create a new environment and install the required packages on Linux: 
 
 ```bash
 conda create -n cstshift python=3.9
 conda activate cstshift
 conda install -c conda-forge rdkit
-conda install numpy pandas PyYAML
+conda install numpy pandas PyYAML tensorboard
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
-conda install pyg -c pyg
+pip install torch_geometric==2.1.0.post1
 ```
 
 If you need to install the package of a specific version or on other platforms, please refer to the official website of the package for more details.
@@ -41,7 +41,7 @@ To use the model to predict chemical shifts for your own dataset, you need to pr
 
 ## Run prediction with processed dataset
 
-With our provided trained models, you can directly run the prediction on the processed dataset by setting all args in a yaml file and run with the following command. The trained models are accessible at https://yzhang.hpc.nyu.edu/IMA .
+With our provided trained models, you can directly run the prediction on the processed dataset by setting all args in a yaml file and run with the following command. The trained models are accessible at https://yzhang.hpc.nyu.edu/IMA . You may want to create a new folder `models` under the root directory and download the trained models to the folder, or you can look into the config file and change the corresponding args.
 
 ```bash
 python src/test.py --test_config configs/embC_test_cheshire.yaml
