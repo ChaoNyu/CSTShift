@@ -16,7 +16,7 @@ conda activate cstshift
 conda install -c conda-forge rdkit
 conda install numpy pandas PyYAML tensorboard
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.3 -c pytorch
-pip install torch_geometric==2.1.0.post1
+pip install torch_geometric==2.1.0.post1 torch-sparse==0.6.15 torch-cluster==1.6.1 torch-scatter==2.0.9
 ```
 
 If you need to install the package of a specific version or on other platforms, please refer to the official website of the package for more details.
