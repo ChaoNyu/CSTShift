@@ -1,0 +1,12 @@
+{
+  "new_test_dir_prefix": "nmrshiftdb2_emb_C",
+  "dataset_class": "NMRDatasetFromProcessed",
+  "labeled_data": true,
+  "split_file_path": "data/NMRShiftDB2_DFT/carbon/processed/split.pt",
+  "ignore_train": true,
+  "ignore_val": true,
+  "avg_iso_atoms": false,
+  "config_name": "model/C_concat_emb1/config.yaml",
+  "test_dir": "nmrshiftdb2_emb_C_0702_182546",
+  "num_workers": 4
+}
