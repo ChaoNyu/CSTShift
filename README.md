@@ -47,7 +47,7 @@ With our provided trained models, you can directly run the prediction on the pro
 python src/test.py --test_config configs/embC_test_cheshire.yaml
 ```
 
-A new folder will be generated, where the args, log file and predicted results will be saved. You can find the example yaml file under `configs/`. The prediction could be accessed in the csv file if save_csv is set to True, or in the `.pt` file as the torch tensor. Set `labeled_data=False` if you want to provide prediction on your own generated dataset without given experimental shift value.
+A new folder will be generated, where the args, log file and predicted results will be saved. You can find the example yaml file under `configs/`. The prediction could be accessed in the csv file if save_csv is set to True, or in the `.pt` file as the torch tensor. `nmrshiftdb2_example_results/` gives an example of the test results of ensembled concat_emb models on NMRShiftDB2-DFT test set. Set `labeled_data=False` if you want to provide prediction on your own generated dataset without given experimental shift value.
 
 ## Train a new model and run prediction
 CSTShift model architecture details：
