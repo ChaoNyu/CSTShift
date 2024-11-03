@@ -22,7 +22,7 @@ pip install torch_geometric==2.1.0.post1 torch-sparse==0.6.15 torch-cluster==1.6
 If you need to install the package of a specific version or on other platforms, please refer to the official website of the package for more details.
 
 ## Data perparation
-CHESHIRE dataset is provided in data/CHESHIRE. Other datasets of NMRShiftDB2, TIC-10 and NHP will be provided later. You can also implement your own dataset class similar to `NMRDataset` if you want to train or evaluate the model on your own dataset.
+CHESHIRE dataset is provided in data/CHESHIRE. Case study data including TIC-10 and NHP is provided in data/case_study_data. NMRShiftDB2 dataset are accessible at https://yzhang.hpc.nyu.edu/IMA. You can also implement your own dataset class similar to `NMRDataset` if you want to train or evaluate the model on your own dataset.
 
 ```bash
 custom_dataset
