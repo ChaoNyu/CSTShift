@@ -182,10 +182,12 @@ class TrainedFolder:
                 for i in range(len(val_data['mol_id'])):  # TODO
                     this_mol_id.extend([val_data['mol_id'][i]] * val_data.N[i])
                 if self.args['mask_atom']:
-                    mask = val_data.mask.bool()
+                    mask = val_data.mask.bool().cpu()
                     this_prop_pred = this_prop_pred[mask, :]
                     this_atom_index = this_atom_index[mask]
                     this_mol_id = [this_mol_id[i] for i in range(len(this_mol_id)) if mask[i]]
+                else:
+                    this_atom_index = this_atom_index.cpu()
                 prop_pred.append(this_prop_pred)
                 atom_index_in_mols.append(this_atom_index)
                 mol_id.extend(this_mol_id)

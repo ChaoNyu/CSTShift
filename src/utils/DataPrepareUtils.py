@@ -42,7 +42,7 @@ def cal_edge(R, N, prev_N, edge_index, cal_coulomb=True):
         Using tensor as dictionary key will cause unexpected problem, for example, memory leak
         '''
         coulomb_index = torch.cat(
-            [_get_index_from_matrix(num.item(), previous_num) for num, previous_num in zip(N, prev_N)], dim=-1)
+            [_get_index_from_matrix(num.item(), previous_num) for num, previous_num in zip(N, prev_N)], dim=-1).to(R.device)
         points1 = R[coulomb_index[0, :], :]
         points2 = R[coulomb_index[1, :], :]
         coulomb_dist = torch.sum((points1 - points2) ** 2, keepdim=True, dim=-1)

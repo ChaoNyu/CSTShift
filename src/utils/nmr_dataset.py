@@ -17,7 +17,9 @@ class MolData(Data):
 
     @staticmethod
     def from_data(data: Data):
-        kwargs = {key: getattr(data, key) for key in data.keys}
+        keys_attr = getattr(data, "keys", None)
+        keys_iter = keys_attr() if callable(keys_attr) else keys_attr  # method vs property for version compatibility
+        kwargs = {key: getattr(data, key) for key in keys_iter}
         return MolData(**kwargs)
 
     def __inc__(self, key: str, value, *args, **kwargs):
@@ -46,7 +48,14 @@ class NMRDataset(InMemoryDataset, ABC):
         """
         self.nmr_log_path = nmr_log_path
         super().__init__(root, transform, pre_transform, pre_filter)
-        self.data, self.slices = torch.load(self.processed_paths[0])
+        try:  # version compatibility for PyTorch
+            self.data, self.slices = torch.load(
+                self.processed_paths[0],
+                weights_only=False
+            )
+        except TypeError:
+            self.data, self.slices = torch.load(self.processed_paths[0])
+
         if not isinstance(self.data, MolData):
             self.data = MolData.from_data(self.data)
         
